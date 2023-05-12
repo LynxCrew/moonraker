@@ -33,7 +33,6 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "managed_services": "moonraker"
     },
     "klipper": {
-        "moved_origin": "https://github.com/Zeanon/klipper.git",
         "origin": "https://github.com/Zeanon/klipper.git",
         "requirements": "scripts/klippy-requirements.txt",
         "venv_args": "-p python2",
