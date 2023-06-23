@@ -1270,7 +1270,7 @@ class WebClientDeploy(BaseDeploy):
 
     async def _detect_fallback(self) -> bool:
         fallback_defs = {
-            "mainsail": "mainsail-crew",
+            "mainsail": "zeanon",
             "fluidd": "fluidd-core"
         }
         for fname in ("manifest.json", "manifest.webmanifest"):
