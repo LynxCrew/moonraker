@@ -1446,6 +1446,7 @@ class GenericHTTP(HTTPDevice):
     async def _send_status_request(self) -> str:
         return await self._send_generic_request("status")
 
+
 # The power component has multiple configuration sections
 def load_component(config: ConfigHelper) -> PrinterPower:
     return PrinterPower(config)
