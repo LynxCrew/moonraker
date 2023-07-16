@@ -216,20 +216,23 @@ class FileManager:
 
     def validate_gcode_path(self, gc_path: str) -> None:
         gc_dir = pathlib.Path(gc_path).expanduser()
-        if "gcodes" in self.file_paths:
-            expected = self.file_paths["gcodes"]
-            if not gc_dir.exists() or not gc_dir.samefile(expected):
-                self.server.add_warning(
-                    "GCode path received from Klipper does not match expected "
-                    "location.\n\n"
-                    f"Received: '{gc_dir}'\nExpected: '{expected}'\n\n"
-                    "Modify the [virtual_sdcard] section Klipper's "
-                    "configuration to correct this error.\n\n"
-                    f"[virtual_sdcard]\npath: {expected}",
-                    warn_id="gcode_path"
-                )
-            else:
-                self.server.remove_warning("gcode_path")
+        if gc_dir.exists():
+            self.file_paths["gcodes"] = os.path.realpath(gc_dir)
+        else:
+			if "gcodes" in self.file_paths:
+				expected = self.file_paths["gcodes"]
+				if not gc_dir.exists() or not gc_dir.samefile(expected):
+					self.server.add_warning(
+						"GCode path received from Klipper does not match expected "
+						"location.\n\n"
+						f"Received: '{gc_dir}'\nExpected: '{expected}'\n\n"
+						"Modify the [virtual_sdcard] section Klipper's "
+						"configuration to correct this error.\n\n"
+						f"[virtual_sdcard]\npath: {expected}",
+						warn_id="gcode_path"
+					)
+				else:
+					self.server.remove_warning("gcode_path")
 
     def register_data_folder(
         self, folder_name: str, full_access: bool = False
