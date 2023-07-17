@@ -215,26 +215,23 @@ class FileManager:
                 )
 
     def validate_gcode_path(self, gc_path: str) -> None:
-        gc_dir = pathlib.Path(gc_path).expanduser()
-        if "gcodes" in self.file_paths:
-            expected = self.file_paths["gcodes"]
-            if not gc_dir.exists() or not gc_dir.samefile(expected):
-                self.server.add_warning(
-                    "GCode path received from Klipper does not match expected "
-                    "location.\n\n"
-                    f"Received: '{gc_dir}'\nExpected: '{expected}'\n\n"
-                    "Modify the [virtual_sdcard] section Klipper's "
-                    "configuration to correct this error.\n\n"
-                    f"[virtual_sdcard]\npath: {expected}",
-                    warn_id="gcode_path"
-                )
-            else:
-                self.server.remove_warning("gcode_path")
+        self.register_folder("gcodes", gc_path, full_access=True)
 
     def register_data_folder(
         self, folder_name: str, full_access: bool = False
     ) -> pathlib.Path:
         new_path = self.datapath.joinpath(folder_name)
+        return self._register_folder(folder_name, new_path, full_access)
+
+    def register_folder(
+        self, folder_name: str, folder_path: str, full_access: bool = False
+    ) -> pathlib.Path:
+        new_path = pathlib.Path(folder_path).expanduser()
+        return self._register_folder(folder_name, new_path, full_access)
+
+    def _register_folder(
+        self, folder_name: str, new_path: pathlib.Path, full_access: bool = False
+    ) -> pathlib.Path:
         if not new_path.exists():
             try:
                 new_path.mkdir()
