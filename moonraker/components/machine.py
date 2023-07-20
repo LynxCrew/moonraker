@@ -781,12 +781,12 @@ class BaseProvider:
         self.server = config.get_server()
         self.shutdown_action = config.get("shutdown_action", "poweroff")
         self.shutdown_action = self.shutdown_action.lower()
-        if self.shutdown_action not in ["halt", "poweroff"]:
-            raise config.error(
-                "Section [machine], Option 'shutdown_action':"
-                f"Invalid value '{self.shutdown_action}', must be "
-                "'halt' or 'poweroff'"
-            )
+        # if self.shutdown_action not in ["halt", "poweroff"]:
+        #     raise config.error(
+        #         "Section [machine], Option 'shutdown_action':"
+        #         f"Invalid value '{self.shutdown_action}', must be "
+        #         "'halt' or 'poweroff'"
+        #     )
         self.available_services: Dict[str, Dict[str, str]] = {}
         self.shell_cmd: SCMDComp = self.server.load_component(
             config, 'shell_command')
