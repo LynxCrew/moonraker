@@ -799,7 +799,7 @@ class BaseProvider:
         return await machine.exec_sudo_command(command)
 
     async def shutdown(self) -> None:
-        await self._exec_sudo_command(f"systemctl {self.shutdown_action}")
+        await self._exec_sudo_command(f"{self.shutdown_action}")
 
     async def reboot(self) -> None:
         await self._exec_sudo_command("systemctl reboot")
