@@ -275,6 +275,7 @@ class GitRepo:
             """
 
         self.repo_warnings: List[str] = []
+        self.repo_anomalies: List[str] = []
         self.managing_instances: List[str] = []
         self.init_evt: Optional[asyncio.Event] = None
         self.initialized: bool = False
@@ -686,10 +687,9 @@ class GitRepo:
         return not (await self.is_ancestor("HEAD", descendent))
 
     def log_repo_info(self) -> None:
-        warnings = ""
-        if self.repo_warnings:
-            warnings = "\nRepo Warnings:\n"
-            warnings += '\n'.join([f"  {warn}" for warn in self.repo_warnings])
+        warnings = self._generate_warn_msg()
+        if warnings:
+            warnings = "\nRepo Warnings:\n" + warnings
         logging.info(
             f"Git Repo {self.alias} Detected:\n"
             f"Owner: {self.git_owner}\n"
@@ -715,44 +715,59 @@ class GitRepo:
         )
 
     def _check_warnings(self) -> None:
+        self.repo_warnings.clear()
+        self.repo_anomalies.clear()
+        if self.repo_corrupt:
+            self.repo_warnings.append("Repo is corrupt")
         if self.upstream_url == "?":
             self.repo_warnings.append("Failed to detect repo url")
             return
-        self.repo_warnings.clear()
         upstream_url = self.upstream_url.lower()
         if upstream_url[-4:] != ".git":
             upstream_url += ".git"
         if upstream_url != self.origin_url.lower():
-            self.repo_warnings.append(f"Unofficial remote url: {self.upstream_url}")
+            self.repo_anomalies.append(f"Unofficial remote url: {self.upstream_url}")
         if self.git_branch != self.primary_branch or self.git_remote != "origin":
-            self.repo_warnings.append(
+            self.repo_anomalies.append(
                 "Repo not on offical remote/branch, expected: "
                 f"origin/{self.primary_branch}, detected: "
                 f"{self.git_remote}/{self.git_branch}")
-        if self.head_detached:
-            self.repo_warnings.append("Detached HEAD detected")
+        if self.untracked_files:
+            self.repo_anomalies.append(
+                f"Repo has untracked source files: {self.untracked_files}"
+            )
         if self.diverged:
-            self.repo_warnings.append("Repo has diverged from remote")
+            self.repo_anomalies.append("Repo has diverged from remote")
+        if self.head_detached:
+            msg = "Detached HEAD detected"
+            if self.server.is_debug_enabled():
+                self.repo_anomalies.append(msg)
+            else:
+                self.repo_warnings.append(msg)
         if self.is_dirty():
             self.repo_warnings.append(
                 "Repo is dirty.  Detected the following modifed files: "
                 f"{self.modified_files}"
             )
-        if self.untracked_files:
-            self.repo_warnings.append(
-                f"Repo has untracked source files: {self.untracked_files}"
-            )
         if len(self.managing_instances) > 1:
             instances = "\n".join([f"  {ins}" for ins in self.managing_instances])
-            self.repo_warnings.append(
+            self.repo_anomalies.append(
                 f"Multiple instances of Moonraker managing this repo:\n"
                 f"{instances}"
             )
+        self._generate_warn_msg()
+
+    def _generate_warn_msg(self) -> str:
         ro_msg = f"Git Repo {self.alias}: No warnings detected"
-        if self.repo_warnings:
-            ro_msg = f"Git Repo {self.alias} Warnings Detected:\n"
-            ro_msg += "\n".join(self.repo_warnings)
+        warn_msg = ""
+        if self.repo_warnings or self.repo_anomalies:
+            ro_msg = f"Git Repo {self.alias}: Warnings detected:\n"
+            warn_msg = "\n".join(
+                [f"  {warn}" for warn in self.repo_warnings + self.repo_anomalies]
+            )
+            ro_msg += warn_msg
         self.server.add_log_rollover_item(f"umgr_{self.alias}_warn", ro_msg, log=False)
+        return warn_msg
 
     def _verify_repo(self, check_remote: bool = False) -> None:
         if not self.valid_git_repo:
@@ -1075,7 +1090,8 @@ class GitRepo:
             'full_version_string': self.current_version.full_version,
             'pristine': no_untrk_src and not self.current_version.dirty,
             'corrupt': self.repo_corrupt,
-            'warnings': self.repo_warnings
+            'warnings': self.repo_warnings,
+            'anomalies': self.repo_anomalies
         }
 
     def get_version(self, upstream: bool = False) -> GitVersion:
