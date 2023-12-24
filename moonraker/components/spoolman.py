@@ -37,6 +37,7 @@ class SpoolManager:
         self.last_sync_time = datetime.datetime.now()
         self.extruded_lock = asyncio.Lock()
         self.spoolman_url = f"{config.get('server').rstrip('/')}/api"
+        self.website = f"{config.get('website', self.spoolman_url).rstrip('/')}"
 
         self.klippy_apis: APIComp = self.server.lookup_component("klippy_apis")
         self.http_client: HttpClient = self.server.lookup_component(
