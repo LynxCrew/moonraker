@@ -150,6 +150,7 @@ class SpoolManager:
                     },
                 )
                 if response.has_error():
+                    logging.info(response._error)
                     if not self.has_printed_error_since_last_down:
                         response.raise_for_status()
                         self.has_printed_error_since_last_down = True
