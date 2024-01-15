@@ -93,6 +93,7 @@ class SpoolManager:
         logging.debug(f"Initial epos: {initial_e_pos}")
         if initial_e_pos is not None:
             self.highest_e_pos = initial_e_pos
+            logging.info("test13")
         else:
             logging.error("Spoolman integration unable to subscribe to epos")
             raise self.server.error("Unable to subscribe to e position")
@@ -124,6 +125,7 @@ class SpoolManager:
             return
         # Store the current spool usage before switching
         if self.spool_id is not None:
+            logging.info("test14")
             await self.track_filament_usage()
         elif spool_id is not None:
             async with self.extruded_lock:
