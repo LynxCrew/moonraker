@@ -121,6 +121,7 @@ class SpoolManager:
     async def set_active_spool(self, spool_id: Optional[int]) -> None:
         logging.info("test8")
         if self.spool_id == spool_id:
+            logging.info("test15")
             logging.info(f"Spool ID already set to: {spool_id}")
             return
         # Store the current spool usage before switching
@@ -128,9 +129,11 @@ class SpoolManager:
             logging.info("test14")
             await self.track_filament_usage()
         elif spool_id is not None:
+            logging.info("test16")
             async with self.extruded_lock:
                 self.extruded = 0
         self.spool_id = spool_id
+        logging.info("test17")
         self.database.insert_item(DB_NAMESPACE, ACTIVE_SPOOL_KEY, spool_id)
         logging.info("test4")
         self.server.send_event(
