@@ -76,9 +76,10 @@ class SpoolManager:
         )
 
     async def component_init(self) -> None:
-        self.spool_id = await self.database.get_item(
-            DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
-        )
+        self.spool_id = 1
+        # self.spool_id = await self.database.get_item(
+        #     DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
+        # )
 
     async def _handle_server_ready(self):
         result = await self.klippy_apis.subscribe_objects(
@@ -199,7 +200,8 @@ class SpoolManager:
 
         logging.info(self.spool_id)
         if (response._code == 404
-                and response.json().get("message")
+                and self.spool_id is not None
+                and response.json()["message"]
                 == ("No spool with ID %d found." % self.spool_id)):
             await self.set_active_spool(None)
         else:
