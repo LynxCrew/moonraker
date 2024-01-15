@@ -79,7 +79,7 @@ class SpoolManager:
         )
 
     async def component_init(self) -> None:
-        self.spool_id = None
+        self.spool_id = 1
         # self.spool_id = await self.database.get_item(
         #     DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
         #)
@@ -108,6 +108,7 @@ class SpoolManager:
         logging.info("test7")
         epos = self._eposition_from_status(status)
         if epos and epos > self.highest_e_pos:
+            logging.info("test20")
             async with self.extruded_lock:
                 self.extruded += epos - self.highest_e_pos
                 self.highest_e_pos = epos
@@ -165,11 +166,11 @@ class SpoolManager:
                         "use_length": used_length,
                     },
                 )
-                # if response.has_error():
-                #     if not self.has_printed_error_since_last_down:
-                #         response.raise_for_status()
-                #         self.has_printed_error_since_last_down = True
-                #     return
+                if response.has_error():
+                    if not self.has_printed_error_since_last_down:
+                        response.raise_for_status()
+                        self.has_printed_error_since_last_down = True
+                    return
 
                 self.has_printed_error_since_last_down = False
                 self.extruded = 0
