@@ -140,12 +140,17 @@ class SpoolManager:
         logging.info(f"Setting active spool to: {spool_id}")
 
     async def track_filament_usage(self):
+        logging.info("test30")
         spool_id = self.spool_id
         if spool_id is None:
+            logging.info("test31")
             logging.debug("No active spool, skipping tracking")
             return
+        logging.info("test32")
         async with self.extruded_lock:
+            logging.info("test33")
             if self.extruded > 0:
+                logging.info("test34")
                 used_length = self.extruded
 
                 logging.debug(
