@@ -195,32 +195,41 @@ class SpoolManager:
         query = web_request.get_str("query", None)
         body = web_request.get("body", None)
 
+        logging.info("test51")
         if method not in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
             raise self.server.error(f"Invalid HTTP method: {method}")
 
+        logging.info("test52")
         if body is not None and method == "GET":
             raise self.server.error("GET requests cannot have a body")
 
+        logging.info("test53")
         if len(path) < 4 or path[:4] != "/v1/":
             raise self.server.error(
                 "Invalid path, must start with the API version, e.g. /v1"
             )
 
+        logging.info("test54")
         if query is not None:
             query = f"?{query}"
         else:
             query = ""
 
+        logging.info("test55")
         full_url = f"{self.spoolman_url}{path}{query}"
 
+        logging.info("test56")
         logging.debug(f"Proxying {method} request to {full_url}")
 
+        logging.info("test57")
         response = await self.http_client.request(
             method=method,
             url=full_url,
             body=body,
         )
+        logging.info("test58")
         response.raise_for_status()
+        logging.info("test59")
 
         return response.json()
 
