@@ -173,8 +173,11 @@ class SpoolManager:
     async def _handle_spool_id_request(self, web_request: WebRequest):
         logging.info("test20")
         if web_request.get_request_type() == RequestType.POST:
+            logging.info("test21")
             spool_id = web_request.get_int("spool_id", None)
+            logging.info("test22")
             await self.set_active_spool(spool_id)
+            logging.info("test23")
         # For GET requests we will simply return the spool_id
         return {"spool_id": self.spool_id}
 
