@@ -200,8 +200,8 @@ class SpoolManager:
 
         logging.info(self.spool_id)
         if (response._code == 404
-                and response.json().get("message").startswith("No spool with ID ")
-                and response.json().get("message").endswith(" found.")):
+                and response.json().get("message")
+                == ("No spool with ID %d found." % self.spool_id)):
             await self.set_active_spool(None)
         else:
             response.raise_for_status()
