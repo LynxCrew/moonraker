@@ -164,11 +164,11 @@ class SpoolManager:
                         "use_length": used_length,
                     },
                 )
-                if response.has_error():
-                    if not self.has_printed_error_since_last_down:
-                        response.raise_for_status()
-                        self.has_printed_error_since_last_down = True
-                    return
+                # if response.has_error():
+                #     if not self.has_printed_error_since_last_down:
+                #         response.raise_for_status()
+                #         self.has_printed_error_since_last_down = True
+                #     return
 
                 self.has_printed_error_since_last_down = False
                 self.extruded = 0
