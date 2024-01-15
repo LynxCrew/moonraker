@@ -179,6 +179,7 @@ class SpoolManager:
             await self.set_active_spool(spool_id)
             logging.info("test23")
         # For GET requests we will simply return the spool_id
+        logging.info("test24")
         return {"spool_id": self.spool_id}
 
     async def _proxy_spoolman_request(self, web_request: WebRequest):
