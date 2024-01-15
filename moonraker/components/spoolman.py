@@ -51,7 +51,6 @@ class SpoolManager:
         self._register_notifications()
         self._register_listeners()
         self._register_endpoints()
-        logging.info("test40")
         self.server.register_remote_method(
             "spoolman_set_active_spool", self.set_active_spool
         )
@@ -113,45 +112,29 @@ class SpoolManager:
                 await self.track_filament_usage()
 
     async def set_active_spool(self, spool_id: Optional[int]) -> None:
-        logging.info("test1")
         if self.spool_id == spool_id:
-            logging.info("test2")
             logging.info(f"Spool ID already set to: {spool_id}")
             return
-        logging.info("test3")
         # Store the current spool usage before switching
         if self.spool_id is not None:
-            logging.info("test4")
             await self.track_filament_usage()
-            logging.info("test5")
         elif spool_id is not None:
-            logging.info("test6")
             async with self.extruded_lock:
-                logging.info("test7")
                 self.extruded = 0
-        logging.info("test8")
         self.spool_id = spool_id
-        logging.info("test9")
         self.database.insert_item(DB_NAMESPACE, ACTIVE_SPOOL_KEY, spool_id)
-        logging.info("test10")
         self.server.send_event(
             "spoolman:active_spool_set", {"spool_id": spool_id}
         )
-        logging.info("test11")
         logging.info(f"Setting active spool to: {spool_id}")
 
     async def track_filament_usage(self):
-        logging.info("test30")
         spool_id = self.spool_id
         if spool_id is None:
-            logging.info("test31")
             logging.debug("No active spool, skipping tracking")
             return
-        logging.info("test32")
         async with self.extruded_lock:
-            logging.info("test33")
             if self.extruded > 0:
-                logging.info("test34")
                 used_length = self.extruded
 
                 logging.debug(
@@ -177,63 +160,50 @@ class SpoolManager:
                 self.extruded = 0
 
     async def _handle_spool_id_request(self, web_request: WebRequest):
-        logging.info("test20")
         if web_request.get_request_type() == RequestType.POST:
-            logging.info("test21")
             spool_id = web_request.get_int("spool_id", None)
-            logging.info("test22")
             await self.set_active_spool(spool_id)
-            logging.info("test23")
         # For GET requests we will simply return the spool_id
-        logging.info("test24")
         return {"spool_id": self.spool_id}
 
     async def _proxy_spoolman_request(self, web_request: WebRequest, retry=False):
-        logging.info("test50")
         method = web_request.get_str("request_method")
         path = web_request.get_str("path")
         query = web_request.get_str("query", None)
         body = web_request.get("body", None)
 
-        logging.info("test51")
         if method not in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
             raise self.server.error(f"Invalid HTTP method: {method}")
 
-        logging.info("test52")
         if body is not None and method == "GET":
             raise self.server.error("GET requests cannot have a body")
 
-        logging.info("test53")
         if len(path) < 4 or path[:4] != "/v1/":
             raise self.server.error(
                 "Invalid path, must start with the API version, e.g. /v1"
             )
 
-        logging.info("test54")
         if query is not None:
             query = f"?{query}"
         else:
             query = ""
 
-        logging.info("test55")
         full_url = f"{self.spoolman_url}{path}{query}"
 
-        logging.info("test56")
         logging.debug(f"Proxying {method} request to {full_url}")
 
-        logging.info("test57")
         response = await self.http_client.request(
             method=method,
             url=full_url,
             body=body,
         )
 
-        logging.info(response._code)
-        logging.info(type(response._code))
-        if (response._code != 404):
-            response.raise_for_status()
-        else:
+        if (response._code != 404
+                and response.json().get("message").startswith("No spool with ID ")
+                and response.json().get("message").endswith(" found")):
             await self.set_active_spool(None)
+        else:
+            response.raise_for_status()
         return response.json()
 
 
