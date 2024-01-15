@@ -79,6 +79,7 @@ class SpoolManager:
         self.spool_id = await self.database.get_item(
             DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
         )
+        logging.info("test")
 
     async def _handle_server_ready(self):
         result = await self.klippy_apis.subscribe_objects(
@@ -150,7 +151,6 @@ class SpoolManager:
                     },
                 )
                 if response.has_error():
-                    logging.info(response._error)
                     if not self.has_printed_error_since_last_down:
                         response.raise_for_status()
                         self.has_printed_error_since_last_down = True
