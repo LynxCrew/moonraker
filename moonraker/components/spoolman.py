@@ -228,9 +228,9 @@ class SpoolManager:
             body=body,
         )
 
-        logging.info(response._error)
-        logging.info(type(response._error))
-        if (response._error != 404):
+        logging.info(response._code)
+        logging.info(type(response._code))
+        if (response._code != 404):
             response.raise_for_status()
         else:
             await self.set_active_spool(None)
