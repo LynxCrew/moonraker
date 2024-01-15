@@ -123,6 +123,7 @@ class SpoolManager:
                 self.extruded = 0
         self.spool_id = spool_id
         self.database.insert_item(DB_NAMESPACE, ACTIVE_SPOOL_KEY, spool_id)
+        logging.info("test4")
         self.server.send_event(
             "spoolman:active_spool_set", {"spool_id": spool_id}
         )
