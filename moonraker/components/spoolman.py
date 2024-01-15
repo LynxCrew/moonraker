@@ -150,7 +150,6 @@ class SpoolManager:
                     },
                 )
                 if response.has_error():
-                    logging.info(response._error)
                     if not self.has_printed_error_since_last_down:
                         response.raise_for_status()
                         self.has_printed_error_since_last_down = True
@@ -166,7 +165,7 @@ class SpoolManager:
         # For GET requests we will simply return the spool_id
         return {"spool_id": self.spool_id}
 
-    async def _proxy_spoolman_request(self, web_request: WebRequest):
+    async def _proxy_spoolman_request(self, web_request: WebRequest, retry=False):
         method = web_request.get_str("request_method")
         path = web_request.get_str("path")
         query = web_request.get_str("query", None)
@@ -197,7 +196,14 @@ class SpoolManager:
             url=full_url,
             body=body,
         )
-        response.raise_for_status()
+
+        if (response._code == 404
+                and self.spool_id is not None
+                and dict(response.json()).get("message")
+                == ("No spool with ID %d found." % self.spool_id)):
+            await self.set_active_spool(None)
+        else:
+            response.raise_for_status()
 
         return response.json()
 
