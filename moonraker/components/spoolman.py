@@ -198,8 +198,6 @@ class SpoolManager:
             body=body,
         )
 
-        logging.info(response.json().get("message"))
-        logging.info(type(response.json().get("message")))
         if (response._code == 404
                 and response.json().get("message").startswith("No spool with ID ")
                 and response.json().get("message").endswith(" found.")):
