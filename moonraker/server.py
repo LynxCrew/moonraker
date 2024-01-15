@@ -227,7 +227,6 @@ class Server:
             ret = component.component_init()
             if ret is not None:
                 await ret
-            logging.info("test2")
         except Exception as e:
             logging.exception(f"Component [{name}] failed post init")
             self.add_warning(f"Component '{name}' failed to load with "
