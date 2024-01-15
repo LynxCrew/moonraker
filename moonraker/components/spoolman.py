@@ -231,7 +231,7 @@ class SpoolManager:
         logging.info("test58")
         logging.info(response._error)
         logging.info(response._code)
-        logging.info(response.json())
+        logging.info(response.json().get("message"))
         response.raise_for_status()
         logging.info("test59")
 
