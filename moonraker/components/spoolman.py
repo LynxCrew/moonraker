@@ -56,14 +56,17 @@ class SpoolManager:
         )
 
     def _register_notifications(self):
+        logging.info("test12")
         self.server.register_notification("spoolman:active_spool_set")
 
     def _register_listeners(self):
+        logging.info("test11")
         self.server.register_event_handler(
             "server:klippy_ready", self._handle_server_ready
         )
 
     def _register_endpoints(self):
+        logging.info("test10")
         self.server.register_endpoint(
             "/server/spoolman/spool_id",
             RequestType.GET | RequestType.POST,
@@ -82,6 +85,7 @@ class SpoolManager:
         logging.info("test")
 
     async def _handle_server_ready(self):
+        logging.info("test5")
         result = await self.klippy_apis.subscribe_objects(
             {"toolhead": ["position"]}, self._handle_status_update, {}
         )
@@ -94,10 +98,12 @@ class SpoolManager:
             raise self.server.error("Unable to subscribe to e position")
 
     def _eposition_from_status(self, status: Dict[str, Any]) -> Optional[float]:
+        logging.info("test6")
         position = status.get("toolhead", {}).get("position", [])
         return position[3] if len(position) > 3 else None
 
     async def _handle_status_update(self, status: Dict[str, Any], _: float) -> None:
+        logging.info("test7")
         epos = self._eposition_from_status(status)
         if epos and epos > self.highest_e_pos:
             async with self.extruded_lock:
@@ -112,6 +118,7 @@ class SpoolManager:
                 await self.track_filament_usage()
 
     async def set_active_spool(self, spool_id: Optional[int]) -> None:
+        logging.info("test8")
         if self.spool_id == spool_id:
             logging.info(f"Spool ID already set to: {spool_id}")
             return
@@ -162,6 +169,7 @@ class SpoolManager:
                 self.extruded = 0
 
     async def _handle_spool_id_request(self, web_request: WebRequest):
+        logging.info("test8")
         if web_request.get_request_type() == RequestType.POST:
             spool_id = web_request.get_int("spool_id", None)
             await self.set_active_spool(spool_id)
@@ -169,6 +177,7 @@ class SpoolManager:
         return {"spool_id": self.spool_id}
 
     async def _proxy_spoolman_request(self, web_request: WebRequest):
+        logging.info("test9")
         method = web_request.get_str("request_method")
         path = web_request.get_str("path")
         query = web_request.get_str("query", None)
