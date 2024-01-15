@@ -51,6 +51,7 @@ class SpoolManager:
         self._register_notifications()
         self._register_listeners()
         self._register_endpoints()
+        logging.info("test40")
         self.server.register_remote_method(
             "spoolman_set_active_spool", self.set_active_spool
         )
