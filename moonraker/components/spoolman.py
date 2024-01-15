@@ -189,6 +189,7 @@ class SpoolManager:
         return {"spool_id": self.spool_id}
 
     async def _proxy_spoolman_request(self, web_request: WebRequest):
+        logging.info("test50")
         method = web_request.get_str("request_method")
         path = web_request.get_str("path")
         query = web_request.get_str("query", None)
