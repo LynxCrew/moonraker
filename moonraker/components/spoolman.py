@@ -228,6 +228,8 @@ class SpoolManager:
             body=body,
         )
 
+        logging.info(response._error)
+        logging.info(type(response._error))
         if (response._error != 404):
             response.raise_for_status()
         else:
