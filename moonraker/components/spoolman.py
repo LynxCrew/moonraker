@@ -228,6 +228,7 @@ class SpoolManager:
             body=body,
         )
         logging.info("test58")
+        logging.info(response._error)
         response.raise_for_status()
         logging.info("test59")
 
