@@ -171,6 +171,7 @@ class SpoolManager:
                 self.extruded = 0
 
     async def _handle_spool_id_request(self, web_request: WebRequest):
+        logging.info("test20")
         if web_request.get_request_type() == RequestType.POST:
             spool_id = web_request.get_int("spool_id", None)
             await self.set_active_spool(spool_id)
