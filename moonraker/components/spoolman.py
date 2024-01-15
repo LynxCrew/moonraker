@@ -76,10 +76,9 @@ class SpoolManager:
         )
 
     async def component_init(self) -> None:
-        self.spool_id = 1
-        # self.spool_id = await self.database.get_item(
-        #     DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
-        # )
+        self.spool_id = await self.database.get_item(
+            DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
+        )
 
     async def _handle_server_ready(self):
         result = await self.klippy_apis.subscribe_objects(
