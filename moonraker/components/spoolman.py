@@ -69,9 +69,10 @@ class SpoolManager:
         )
 
     async def component_init(self) -> None:
-        self.spool_id = await self.database.get_item(
-            DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
-        )
+        self.spool_id = 1
+        # self.spool_id = await self.database.get_item(
+        #     DB_NAMESPACE, ACTIVE_SPOOL_KEY, None
+        # )
         if self.spool_id is not None:
             response = await self.http_client.get(
                 f"{self.spoolman_url}/v1/spool/{self.spool_id}",
