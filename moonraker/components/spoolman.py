@@ -39,6 +39,7 @@ class SpoolManager:
         self.server = config.get_server()
         self.eventloop = self.server.get_event_loop()
         self._get_spoolman_urls(config)
+        self._get_website_urls(config)
         self.sync_rate_seconds = config.getint("sync_rate", default=5, minval=1)
         self.report_timer = self.eventloop.register_timer(self.report_extrusion)
         self.pending_reports: Dict[int, float] = {}
@@ -67,25 +68,27 @@ class SpoolManager:
     def _get_spoolman_urls(self, config: ConfigHelper) -> None:
         orig_url = config.get('server')
         url_match = re.match(r"(?i:(?P<scheme>https?)://)?(?P<host>.+)", orig_url)
-        orig_website = config.get('website')
-        website_match = re.match(r"(?i:(?P<scheme>https?)://)?(?P<host>.+)", orig_website)
         if url_match is None:
             raise config.error(
                 f"Section [spoolman], Option server: {orig_url}: Invalid URL format"
             )
-        if website_match is None:
-            raise config.error(
-                f"Section [spoolman], Option website: {orig_website}: Invalid URL format"
-            )
         scheme = url_match["scheme"] or "http"
         host = url_match["host"].rstrip("/")
         ws_scheme = "wss" if scheme == "https" else "ws"
-        website_scheme = website_match["scheme"] or "http"
-        website_host = website_match["host"].rstrip("/")
-        ws_website_scheme = "wss" if website_scheme == "https" else "ws"
         self.spoolman_url = f"{scheme}://{host}/api"
         self.ws_url = f"{ws_scheme}://{host}/api/v1/spool"
-        self.website = f"{ws_website_scheme}://{website_host}/spool"
+
+    def _get_website_urls(self, config: ConfigHelper):
+        orig_website_url = config.get('website', self.spoolman_url)
+        website_url_match = re.match(r"(?i:(?P<scheme>https?)://)?(?P<host>.+)", orig_website_url)
+        if website_url_match is None:
+            raise config.error(
+                f"Section [spoolman], Option website: {orig_website_url}: Invalid URL format"
+            )
+        website_scheme = website_url_match["scheme"] or "http"
+        website_host = website_url_match["host"].rstrip("/")
+        self.website_url = f"{website_scheme}://{website_host}/spool"
+        self.website = f"{website_scheme}://{website_host}/spool"
 
     def _register_notifications(self):
         self.server.register_notification("spoolman:active_spool_set")
