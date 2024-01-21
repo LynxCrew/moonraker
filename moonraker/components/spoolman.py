@@ -80,10 +80,12 @@ class SpoolManager:
 
     def _get_website_urls(self, config: ConfigHelper):
         orig_website_url = config.get('website', self.spoolman_url)
-        website_url_match = re.match(r"(?i:(?P<scheme>https?)://)?(?P<host>.+)", orig_website_url)
+        website_url_match = re.match(r"(?i:(?P<scheme>https?)://)?(?P<host>.+)",
+                                     orig_website_url)
         if website_url_match is None:
             raise config.error(
-                f"Section [spoolman], Option website: {orig_website_url}: Invalid URL format"
+                f"Section [spoolman], Option website: {orig_website_url}: "
+                f"Invalid URL format"
             )
 
     def _register_notifications(self):
