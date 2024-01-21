@@ -85,10 +85,6 @@ class SpoolManager:
             raise config.error(
                 f"Section [spoolman], Option website: {orig_website_url}: Invalid URL format"
             )
-        website_scheme = website_url_match["scheme"] or "http"
-        website_host = website_url_match["host"].rstrip("/")
-        self.website_url = f"{website_scheme}://{website_host}/spool"
-        self.website = f"{website_scheme}://{website_host}/spool"
 
     def _register_notifications(self):
         self.server.register_notification("spoolman:active_spool_set")
