@@ -5,10 +5,12 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
 from __future__ import annotations
+import os.path
 import pathlib
 import shutil
 import zipfile
 import logging
+from stat import S_IXUSR
 from .app_deploy import AppDeploy
 from .common import Channel, AppType
 from ...utils import source_info
@@ -310,8 +312,11 @@ class ZipDeploy(AppDeploy):
         self.path.mkdir()
         with zipfile.ZipFile(release_file) as zf:
             for zip_entry in zf.filelist:
-                dest = pathlib.Path(zf.extract(zip_entry, str(self.path)))
-                dest.chmod((zip_entry.external_attr >> 16) & 0o777)
+                extracted_path = zf.extract(zip_entry, str(self.path))
+                if os.path.isfile(extracted_path):
+                    unix_attributes = zip_entry.external_attr >> 16
+                    if unix_attributes & S_IXUSR:
+                        os.chmod(extracted_path, os.stat(extracted_path).st_mode | S_IXUSR)
         # Move temporary files back into
         for src_path in persist_dir.iterdir():
             dest_path = self.path.joinpath(src_path.name)
