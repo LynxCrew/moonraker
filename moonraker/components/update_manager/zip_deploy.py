@@ -316,7 +316,8 @@ class ZipDeploy(AppDeploy):
                 if os.path.isfile(extracted_path):
                     unix_attributes = zip_entry.external_attr >> 16
                     if unix_attributes & S_IXUSR:
-                        os.chmod(extracted_path, os.stat(extracted_path).st_mode | S_IXUSR)
+                        os.chmod(extracted_path,
+                                 os.stat(extracted_path).st_mode | S_IXUSR)
         # Move temporary files back into
         for src_path in persist_dir.iterdir():
             dest_path = self.path.joinpath(src_path.name)
