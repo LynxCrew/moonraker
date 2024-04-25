@@ -384,6 +384,7 @@ class SpoolManager:
         else:
             return {
                 "response": response.json(),
+                "response_headers": dict(response.headers.items()),
                 "error": None
             }
 
