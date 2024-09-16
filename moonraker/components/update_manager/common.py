@@ -33,7 +33,7 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "managed_services": "moonraker"
     },
     "klipper": {
-        "origin": "https://github.com/LynxCrew/klipper.git",
+        "origin": "https://github.com/LynxCrew/danger-klipper.git",
         "requirements": "scripts/klippy-requirements.txt",
         "venv_args": "-p python3",
         "install_script": "scripts/install-octopi.sh",
