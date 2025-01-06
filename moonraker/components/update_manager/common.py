@@ -38,7 +38,7 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "venv_args": "-p python3",
         "install_script": "scripts/install-octopi.sh",
         "managed_services": "klipper",
-        "info_tags": ["desc=Kalico"],
+        "info_tags": "desc=Kalico",
     }
 }
 
