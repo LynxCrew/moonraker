@@ -39,7 +39,7 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "install_script": "scripts/install-octopi.sh",
         "managed_services": "klipper"
         "info_tags:"
-        "  desc=Beacon Surface Scanner"
+        "  desc=Kalico"
     }
 }
 
