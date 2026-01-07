@@ -54,6 +54,7 @@ class SpoolManager:
         self.spool_id: Optional[int] = None
         self._error_logged: bool = False
         self._highest_epos: float = 0
+        self._last_epos: float = 0
         self._current_extruder: str = "extruder"
         self.spool_history = HistoryFieldData(
             "spool_ids", "spoolman", "Spool IDs used", "collect",
@@ -273,6 +274,7 @@ class SpoolManager:
         if toolhead is None:
             return
         epos: float = toolhead.get("position", [0, 0, 0, self._highest_epos])[3]
+        self._last_epos = epos
         extr = toolhead.get("extruder", self._current_extruder)
         if extr != self._current_extruder:
             self._highest_epos = epos
@@ -296,6 +298,7 @@ class SpoolManager:
         self.spool_history.tracker.update(spool_id)
         self.spool_id = spool_id
         self.database.insert_item(DB_NAMESPACE, ACTIVE_SPOOL_KEY, spool_id)
+        self._highest_epos = self._last_epos
         self.server.send_event(
             "spoolman:active_spool_set", {"spool_id": spool_id}
         )
