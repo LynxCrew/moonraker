@@ -8,9 +8,15 @@ __pycache__/
 venv
 start_moonraker
 *.env
+*.egg-info
 .pdm-python
 build
 dist
 
 .idea/
 share
+
+.vscode
+.mypy_cache
+.pdm-build
+.pytest_cache
